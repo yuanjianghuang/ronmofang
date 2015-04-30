@@ -42,7 +42,7 @@ class ronmofangSpider(CrawlSpider):
         self.log('A response from %s just arrived!' % response.url)
         item = RonmofangItem()
         sel =  Selector(response)
-        item['name'] = sel.xpath('//html/body/div[1]/div[4]/div/div[1]/p[10]/text()').extract()
+        item['name'] = sel.xpath('//html/body/div[1]/div[6]/div/div/div[1]/p/text()').extract()
 
         with open("foo.txt", "w+") as f:
             f.write(item['name'][0].encode('utf-8'))

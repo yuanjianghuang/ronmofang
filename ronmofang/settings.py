@@ -15,7 +15,11 @@ NEWSPIDER_MODULE = 'ronmofang.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'ronmofang (+http://www.yourdomain.com)'
-ITEM_PIPELINES = ['ronmofang.pipelines.RonmofangPipeline', ]
+# To activate an item pipeline. It is allowed to have many pipelines
+ITEM_PIPELINES = {'ronmofang.pipelines.RonmofangPipeline': 20,
+                  'ronmofang.pipelines.RonmofangPipelineAlternative': 21,
+                  'ronmofang.pipelines.FilterWordsPipeline': 22
+                  }
 
 MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
