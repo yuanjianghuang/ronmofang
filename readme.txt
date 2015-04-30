@@ -29,3 +29,4 @@ Scrapy Tutorial http://doc.scrapy.org/en/latest/intro/overview.html
   https://github.com/nautilus28/linkedpy linkedin
   https://github.com/pengyuan/oscbot 爬取OSCHINA（开源中国社区）
   https://github.com/chenghao/TBSpiders 淘宝
+  https://github.com/gnemoug/distribute_crawler  使用scrapy,redis, mongodb,graphite实现的一个分布式网络爬虫
