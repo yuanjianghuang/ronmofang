@@ -15,10 +15,10 @@ Scrapy Tutorial http://doc.scrapy.org/en/latest/intro/overview.html
        C:\mongodb\bin\mongod.exe --dbpath d:\test\mongodb\data
 
 - Reference
- https://github.com/monsterxx03/yeeyan-spider 抓译言网
- https://github.com/tpeng/googlesearch Scrape the google advanced search
- https://github.com/darthbear/scrapy-mongodb-pipeline  MongoDB and scrapy
-  https://github.com/gnemoug/distribute_crawler
+ https://github.com/monsterxx03/yeeyan-spider 抓译言网 // note 它定位了所有资源的位置。
+
+ https://github.com/darthbear/scrapy-mongodb-pipeline  MongoDB and scrapy // incomplete
+  https://github.com/gnemoug/distribute_crawler 使用scrapy,redis, mongodb,graphite实现的一个分布式网络爬虫
   https://github.com/clasense4/scrapy-blog-crawler  crawl URLs in a blog, and store it.
   https://github.com/Zozoz/crawler_images scrapy + redis + monodb
   https://github.com/hackrole/blog-scrapy  抓博客
@@ -29,4 +29,3 @@ Scrapy Tutorial http://doc.scrapy.org/en/latest/intro/overview.html
   https://github.com/nautilus28/linkedpy linkedin
   https://github.com/pengyuan/oscbot 爬取OSCHINA（开源中国社区）
   https://github.com/chenghao/TBSpiders 淘宝
-  https://github.com/gnemoug/distribute_crawler  使用scrapy,redis, mongodb,graphite实现的一个分布式网络爬虫
