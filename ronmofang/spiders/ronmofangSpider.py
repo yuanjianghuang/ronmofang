@@ -7,6 +7,7 @@ from ronmofang.items import RonmofangItem
 import os
 from bs4 import BeautifulSoup
 import urllib2
+from scrapy.selector import HtmlXPathSelector
 
 class ronmofangSpider(CrawlSpider):
     # name is how the spider is located and instantiated by Spider. Must be unique.
@@ -43,12 +44,13 @@ class ronmofangSpider(CrawlSpider):
     def parse(self, response):
         self.log('A response from %s just arrived!' % response.url)
         item = RonmofangItem()
-        sel =  Selector(response)
-        item['name'] = sel.xpath('//html/body/div[1]/div[4]/div/div[1]/p[5]/strong/text()').extract()
-        soup = BeautifulSoup(urllib2.urlopen("http://www.rongmofang.com/information/infodetails/197").read())
-       # soup = BeautifulSoup(response)
+        #sel =  Selector(response)
+        #item['name'] = sel.xpath('//html/body/div[1]/div[4]/div/div[1]/p[5]/strong/text()').extract()
+        soup = BeautifulSoup(response.body)
         result = soup.find("div", {"class":"span9 separate"})
         print result.text.encode("GBK", "ignore")
+
+        item['description'] = result.text.encode('utf-8')
         #or, use the following line to solve the encoding problem
         # http://www.crifan.com/unicodeencodeerror_gbk_codec_can_not_encode_character_in_position_illegal_multibyte_sequence/
        # print result.text.encode("GB18030")
@@ -56,8 +58,8 @@ class ronmofangSpider(CrawlSpider):
      # yield self.make_requests_from_url(url).replace(callback=self.parse_content)
 
         with open("foo.txt", "w+") as f:
-            f.write(item['name'][0].encode('utf-8'))
-            f.write(result.text.encode("GBK", "ignore"))
+          #  f.write(item['name'][0].encode('utf-8'))
+            f.write(result.text.encode('utf-8'))
             f.close( )
 
         yield item
