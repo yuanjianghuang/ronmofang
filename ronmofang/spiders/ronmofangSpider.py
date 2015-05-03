@@ -20,7 +20,7 @@ class ronmofangSpider(CrawlSpider):
     # Declare the start URLs
     start_urls = [
       #  'http://www.dmoz.org/Computers/Programming/Languages/Python/Books/',
-         'http://www.rongmofang.com/information/infodetails/204'
+         'http://www.rongmofang.com/home/about#ContactUs'
         ]
 
     # define the rules to crawl web pages
@@ -47,7 +47,7 @@ class ronmofangSpider(CrawlSpider):
         #sel =  Selector(response)
         #item['name'] = sel.xpath('//html/body/div[1]/div[4]/div/div[1]/p[5]/strong/text()').extract()
         soup = BeautifulSoup(response.body)
-        result = soup.find("div", {"class":"span9 separate"})
+        result = soup.find("div", {"class":"span5"})
         print result.text.encode("GBK", "ignore")
 
         item['description'] = result.text.encode('utf-8')
