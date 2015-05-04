@@ -6,7 +6,8 @@ from scrapy import Selector
 from ronmofang.items import RonmofangItem
 import os
 from bs4 import BeautifulSoup
-import urllib2
+from bs4 import SoupStrainer
+import urlparse
 from scrapy.selector import HtmlXPathSelector
 
 class ronmofangSpider(CrawlSpider):
@@ -17,10 +18,8 @@ class ronmofangSpider(CrawlSpider):
     allowed_domains = [
         'ronmofang.com'
     ]
-    # Declare the start URLs
     start_urls = [
-      #  'http://www.dmoz.org/Computers/Programming/Languages/Python/Books/',
-         'http://www.rongmofang.com/home/about#ContactUs'
+         'http://www.rongmofang.com/'
         ]
 
     # define the rules to crawl web pages
@@ -47,10 +46,13 @@ class ronmofangSpider(CrawlSpider):
         #sel =  Selector(response)
         #item['name'] = sel.xpath('//html/body/div[1]/div[4]/div/div[1]/p[5]/strong/text()').extract()
         soup = BeautifulSoup(response.body)
-        result = soup.find("div", {"class":"span5"})
+        result = soup.find("div", {"class":"border home_left"})
         print result.text.encode("GBK", "ignore")
 
         item['description'] = result.text.encode('utf-8')
+        for tag in soup.findAll('a', href=True):
+            item['url'] = urlparse.urljoin(response.url, tag['href'])
+            print item['url']
         #or, use the following line to solve the encoding problem
         # http://www.crifan.com/unicodeencodeerror_gbk_codec_can_not_encode_character_in_position_illegal_multibyte_sequence/
        # print result.text.encode("GB18030")
@@ -60,7 +62,23 @@ class ronmofangSpider(CrawlSpider):
         with open("foo.txt", "w+") as f:
           #  f.write(item['name'][0].encode('utf-8'))
             f.write(result.text.encode('utf-8'))
-            f.close( )
+            f.close()
 
         yield item
        # return item
+
+    def resolve_links(self, links):
+        root = self.guess_root(links)
+        for link in links:
+            if not link.startswith('http' or 'https'):
+                link = urlparse.urljoin(root, link)
+                yield link
+
+    def guess_root(self, links):
+        for link in links:
+            if link.startswith('http' or 'https'):
+                parsed_link = urlparse.urlparse(link)
+                scheme = parsed_link.scheme + '://'
+                netloc = parsed_link.netloc
+            return scheme + netloc
+
