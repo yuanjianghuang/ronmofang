@@ -43,20 +43,24 @@ class ronmofangSpider(CrawlSpider):
 
     # 2, another simple way is to implement the  callback (default parse). It returns Item and/or Request
     # It is invoked each time a response arrives
-    external_link = []
-    intern_link = []
+
     tree = Tree()
     tree.create_node(start_urls[0], start_urls[0])
 
     def parse(self, response):
         self.log('A response from %s just arrived!' % response.url)
         item = RonmofangItem()
+        external_link = []
+        internal_link = []
         #sel =  Selector(response)
         #item['name'] = sel.xpath('//html/body/div[1]/div[4]/div/div[1]/p[5]/strong/text()').extract()
         soup = BeautifulSoup(response.body)
         for script in soup(["script", "style"]):
             script.extract()  # rip JavaScript code and style in a web page
         ronmofangSpider.save2file(soup.get_text())
+        item['url'] = response.url
+        item['text'] = soup.get_text()
+
         #print(soup.get_text().encode("GBK", "ignore"))
         # result = soup.find("div", {"class":"border home_left"})
         # print result.text.encode("GBK", "ignore")
@@ -65,9 +69,9 @@ class ronmofangSpider(CrawlSpider):
         for tag in soup.findAll('a', href=True):
             obtained_url = urlparse.urljoin(response.url, tag['href'])
             if ronmofangSpider.external_links(obtained_url, self.start_urls[0]):
-                self.external_link.append(obtained_url)
+                external_link.append(obtained_url)
             else:
-                self.intern_link.append(obtained_url)
+                internal_link.append(obtained_url)
                 if self.grow_tree(obtained_url, response.url):
                     current_node = self.tree.get_node(obtained_url)
                     current_level = self.tree.depth(current_node)
@@ -79,9 +83,8 @@ class ronmofangSpider(CrawlSpider):
                             print "Something wrong with making a request !"
                             pass
 
-        self.external_link = ronmofangSpider.remove_duplicate(self.external_link)
-        self.intern_link = ronmofangSpider.remove_duplicate(self.intern_link)
-
+        item['url_external'] = ronmofangSpider.remove_duplicate(external_link)
+        item['url_internal'] = ronmofangSpider.remove_duplicate(internal_link)
         #  print self.external_link
 
         #  print self.intern_link
@@ -98,7 +101,6 @@ class ronmofangSpider(CrawlSpider):
 
 
         yield item
-        # return item
 
     def grow_tree(self, url, parent_url):
         if self.tree.get_node(url) is None:
