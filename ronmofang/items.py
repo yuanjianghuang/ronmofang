@@ -15,5 +15,6 @@ class RonmofangItem(scrapy.Item):
     id = scrapy.Field()
     name = scrapy.Field()
     description = scrapy.Field()
-    url = scrapy.Field()
+    url_internal = scrapy.Field()
+    url_external = scrapy.Field()
 
