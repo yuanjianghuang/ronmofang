@@ -35,3 +35,15 @@ Scrapy Tutorial http://doc.scrapy.org/en/latest/intro/overview.html
 
   https://github.com/darthbear/scrapy-mongodb-pipeline  MongoDB and scrapy // incomplete
   https://github.com/paulproteus/autoresponse  http auto-response no use
+
+  TODO:
+  - text clean up
+  - obtain the target terms
+  - segment text (Chinese)
+  - word frequency, distribution of term frequencies.
+  - word clouds
+  - identify frequent items and associations
+
+  Ref. Web Data Mining 2nd
+  - opinion mining and sentiment analysis
+  -
