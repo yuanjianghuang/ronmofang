@@ -30,5 +30,5 @@ MONGODB_COLLECTION = "ronmofangCollection"
 # download delay
 DOWNLOAD_DELAY = 5
 
-# define search depth
-DEPTH = 3
+# define search depth，value >= 1
+DEPTH = 2

@@ -12,7 +12,13 @@ import ronmofang.settings as setting
 from scrapy import log
 from scrapy.selector import HtmlXPathSelector
 from treelib import Node, Tree
-# the tool to create a tree. This tool is handy I think. install pip treelib
+# the tool to create a tree. This tool is handy I think.
+#  http://xiaming.me/treelib/examples.html#api-examples. install pip treelib
+from scrapy.signalmanager import SignalManager
+from scrapy.xlib.pydispatch import dispatcher
+from scrapy import signals
+import scrapy.exceptions
+import json
 
 class ronmofangSpider(CrawlSpider):
     # name is how the spider is located and instantiated by Spider. Must be unique.
@@ -23,8 +29,19 @@ class ronmofangSpider(CrawlSpider):
         'ronmofang.com'
     ]
     start_urls = [
-        'http://www.rongmofang.com/'
+        'http://www.rongmofang.com/',
+       # 'http://stackoverflow.com/questions/12394184/scrapy-call-a-function-when-a-spider-quits'
     ]
+
+    # http responde error code, see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+    handle_httpstatus_list = [404, 500]
+
+    def __init__(self, *args, **kwargs):
+        super(ronmofangSpider, self).__init__(*args, **kwargs)
+        #register  signal listeners through dispatcher to deal with some tasks before close the spider if necessary
+        # two tasks are registered: task before close the spider, and handle errors
+        dispatcher.connect(self.spider_closed, signals.spider_closed)
+        dispatcher.connect(self.spider_error, signals.spider_error)
 
     # define the rules to crawl web pages
     # usage: class scrapy.contrib.spiders.Rule(link_extractor, callback=None, cb_kwargs=None, follow=None,
@@ -48,6 +65,11 @@ class ronmofangSpider(CrawlSpider):
     tree.create_node(start_urls[0], start_urls[0])
 
     def parse(self, response):
+
+        # handle the response
+        if response.status in self.handle_httpstatus_list:
+            self.log('Http request failed! ')
+            return
         self.log('A response from %s just arrived!' % response.url)
         item = RonmofangItem()
         external_link = []
@@ -75,32 +97,38 @@ class ronmofangSpider(CrawlSpider):
                 if self.grow_tree(obtained_url, response.url):
                     current_node = self.tree.get_node(obtained_url)
                     current_level = self.tree.depth(current_node)
-                    if current_level <= setting.DEPTH:
+                    if current_level < setting.DEPTH:
                         self.log('make request from %s at level %s. ' % (obtained_url, current_level))
                         try:
                             yield self.make_requests_from_url(obtained_url).replace(callback=self.parse)
                         except Exception:
                             print "Something wrong with making a request !"
                             pass
+                    else:
+                        self.log('Stop growing the tree and sending requests at this node !')
 
         item['url_external'] = ronmofangSpider.remove_duplicate(external_link)
         item['url_internal'] = ronmofangSpider.remove_duplicate(internal_link)
-        #  print self.external_link
-
-        #  print self.intern_link
-
-
-
-
 
         #or, use the following line to solve the encoding problem
         # http://www.crifan.com/unicodeencodeerror_gbk_codec_can_not_encode_character_in_position_illegal_multibyte_sequence/
         # print result.text.encode("GB18030")
         # yield new request and define the callback function
         # yield self.make_requests_from_url(url).replace(callback=self.parse_content)
-
-
         yield item
+
+    def spider_closed(self, spider):
+    # do the work that before the spider closed.
+        self.log('If needed, do some works here before the spider is closed. ')
+        #self.tree.save2file('E:\PythonProject\ronmofang\tree')
+        data = self.tree.to_json()
+        with open("tree.txt", "w+") as f:
+            json.dump(data, f)
+
+    def spider_error(self, spider):
+    # handle http request error
+        self.log('If needed, do some works to handle errors here. ')
+
 
     def grow_tree(self, url, parent_url):
         if self.tree.get_node(url) is None:
@@ -129,7 +157,8 @@ class ronmofangSpider(CrawlSpider):
     @staticmethod
     def external_links(link, url):
         external = True
-        if link.startswith(url):
+        # ignore the URLs schema, e.g. http and https are the same domain
+        if urlparse.urlparse(link).netloc == urlparse.urlparse(url).netloc:
             external = False
         return external
 
@@ -137,14 +166,15 @@ class ronmofangSpider(CrawlSpider):
     def remove_duplicate(links):
         return list(set(links))
 
-    def resolve_links(self, links):
-        root = self.guess_root(links)
+    @staticmethod
+    def resolve_links(links):
+        root = ronmofangSpider.guess_root(links)
         for link in links:
             if not link.startswith('http' or 'https'):
                 link = urlparse.urljoin(root, link)
                 yield link
-
-    def guess_root(self, links):
+    @staticmethod
+    def guess_root(links):
         for link in links:
             if link.startswith('http' or 'https'):
                 parsed_link = urlparse.urlparse(link)
