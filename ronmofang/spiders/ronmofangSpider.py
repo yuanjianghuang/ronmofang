@@ -19,7 +19,6 @@ from scrapy.xlib.pydispatch import dispatcher
 from scrapy import signals
 import scrapy.exceptions
 import json
-
 class ronmofangSpider(CrawlSpider):
     # name is how the spider is located and instantiated by Spider. Must be unique.
     name = 'ronmofang'
