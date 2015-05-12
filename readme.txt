@@ -47,3 +47,8 @@ Scrapy Tutorial http://doc.scrapy.org/en/latest/intro/overview.html
   Ref. Web Data Mining 2nd
   - opinion mining and sentiment analysis
   -
+
+jieba 采用IF-IDF提取文档特征 （核心是寻找最能体现文档特征以及体现与其他文档的区分度的词汇。）
+http://zh.wikipedia.org/wiki/TF-IDF
+TFIDF算法是建立在这样一个假设之上的：对区别文档最有意义的词语应该是那些在文档中出现频率高(TF)，
+而在整个文档集合的其他文档中出现频率少的词语 (IDF)，所以如果特征空间坐标系取TF词频作为测度，就可以体现同类文本的特点。
